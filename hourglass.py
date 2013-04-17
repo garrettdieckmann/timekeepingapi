@@ -1,5 +1,5 @@
 # Flask imports
-from flask import Flask, request
+from flask import Flask, request, render_template
 from werkzeug.contrib.fixers import ProxyFix
 # Database imports
 from db.createdevdb import Time_event, User, List, Database_creation
