@@ -23,7 +23,8 @@ class Database_creation():
 		engine_host = db_config.get("database","host")
 		engine_database = db_config.get("database","database")
 
-		create_engine_string = '%s://%s:%s@%s/%s' % (engine_type, engine_user, engine_password, engine_host, engine_database)
+		create_engine_string = '%s://%s:%s@%s/%s' % (engine_type, 
+			engine_user, engine_password, engine_host, engine_database)
 		return create_engine_string
 
 
