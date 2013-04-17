@@ -14,10 +14,14 @@ engine = create_engine(dbc.create_engine_string(), echo=True)
 
 app = Flask(__name__)
 
-# Root of API
-@app.route('/api/')
-def hello():
-	return "Hello world!"
+### BASIC SITE ###
+
+# Index/home page
+@app.route('/')
+def index():
+	return render_template('index.html')
+
+### END BASIC SITE ###
 
 ### DEV API ###
 
