@@ -38,7 +38,6 @@ def show_users(userid):
                 return not_found()	
 
 # Show users with SQL connection
-# TODO: Use sqlalchemy to make connection - Needs to create an 'engine'
 @app.route('/devapi/sql/user')
 def sql_show_users():
 	Session = sessionmaker(bind=engine)
