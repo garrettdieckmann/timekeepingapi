@@ -3,8 +3,8 @@
 # Main manager page
 function main_page {
 	# Source virtualenv
-	# TODO How to source in script from other script?
-	source  $TIMEKEEPINGDIR/bin/activate
+	# Just hard-code location for now
+	. ../bin/activate
 
 	# Header
 	echo '----------------------------'
@@ -49,14 +49,16 @@ function boot_gunicorn {
 	
 	echo 'Enter to continue...'
 	read continuation
+	main_page
 }
 
 # Show Gunicorn Processes
 function gunicorn_processes {
-	`ps -ef | grep -i gunicorn | awk '{print $2}'`
+	ps -ef | grep -i gunicorn
 	
 	echo 'Enter to continue...'
         read continuation
+	main_page
 
 }
 
@@ -67,6 +69,7 @@ function kill_gunicorn {
 
 	echo 'Enter to continue...'
         read continuation
+	main_page
 }
 
 # Start the manager
