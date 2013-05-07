@@ -2,8 +2,9 @@
 
 # Main manager page
 function main_page {
-	# clear out existing items on the terminal screen
-	clear
+	# Source virtualenv
+	# TODO How to source in script from other script?
+	source  $TIMEKEEPINGDIR/bin/activate
 
 	# Header
 	echo '----------------------------'
@@ -15,7 +16,7 @@ function main_page {
 	echo '2) Show Gunicorn Processes'
 	echo '3) Kill Gunicorn Processes'
 	echo
-	echo 'q to quit'
+	echo 'q) to quit'
 	echo 
 	
 	# read input
@@ -27,6 +28,8 @@ function main_page {
 		gunicorn_processes
 	elif [ $command = "3" ]; then
 		kill_gunicorn
+	elif [ $command = "q" ]; then
+		echo 'bye!'
 	else
 		echo 'I dont know that command'
 		main_page
@@ -67,5 +70,6 @@ function kill_gunicorn {
 }
 
 # Start the manager
+clear
 main_page
 	
