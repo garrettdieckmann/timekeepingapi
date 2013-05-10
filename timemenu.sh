@@ -54,7 +54,7 @@ function boot_gunicorn {
 
 # Show Gunicorn Processes
 function gunicorn_processes {
-	ps -ef | grep -i gunicorn
+	ps -ef | grep -i gunicorn | awk '{print $2,$9,$10}'
 	
 	echo 'Enter to continue...'
         read continuation
