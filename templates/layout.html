@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+	<style type="text/css">
+		body {
+			padding-top: 60px;
+			padding-bottom: 40px;
+		}
+	</style>
 	<title>Hourglass | Timekeeping</title>
 </head>
 <body>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<a class="brand" href="#">Hourglass</a>
+			</div>
+		</div>
+	</div>
+
 	<div class="container">
 		{% block content %}
 		{% endblock %}
 	</div>
+
+	<footer>
+		<p>Hourglass | 2013</p>
+	</footer>
 </body>
 </html>		
