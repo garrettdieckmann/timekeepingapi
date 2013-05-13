@@ -51,7 +51,7 @@ class User(Base):
 class Customer_Information(Base):
 	__tablename__ = "customer_information"
 	
-	user_id = Column(Integer, primary_key = True, ForeignKey("users.user_id"))
+	user_id = Column(Integer, primary_key = True)
 	first_name = Column(String(32))
 	las_name = Column(String(32))
 	age = Column(Integer)
