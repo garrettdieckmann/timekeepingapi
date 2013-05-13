@@ -1,6 +1,6 @@
 # Import SQLAlchemy ORM
 from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy import Column, Date, Integer, String
+from sqlalchemy import Column, Date, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 # Import config parser
@@ -55,7 +55,7 @@ class Customer_Information(Base):
 	first_name = Column(String(32))
 	las_name = Column(String(32))
 	age = Column(Integer)
-	gender = Column(Boolean) #0 - Male, 1 - Female
+	gender = Column(Boolean, unique=False, default=True) #0 - Male, 1 - Female
 	email = Column(String(128))
 	time_zone = Column(String(32))
 	zipcode = Column(Integer)
@@ -93,28 +93,28 @@ class Category(Base):
 		
 # Tab
 class Tab(Base):
-	__tablename__ = "tab"
+	__tablename__ = "tag"
 	
-	tab_id = Column(Integer, primary_key=True)
-	tab_name = Column(String(64))
-	tab_description = Column(String(32))
+	tag_id = Column(Integer, primary_key=True)
+	tag_name = Column(String(64))
+	tag_description = Column(String(32))
 
-	def __init__(self, tab_name, tab_description):
-		self.tab_name = tab_name
-		self.tab_description = tab_description
+	def __init__(self, tag_name, tag_description):
+		self.tag_name = tag_name
+		self.tag_description = tag_description
 
 		
 # Category-Tab Table
 class Category_Tab(Base):
-	__tablename__ = "category_tab"
+	__tablename__ = "category_tag"
 	
 	id = Column(Integer, primary_key=True)
 	category_id = Column(Integer, ForeignKey("category.category_id"))
-	tab_id = Column(Integer, ForeignKey("tab.tab_id"))
+	tag_id = Column(Integer, ForeignKey("tag.tag_id"))
 
-	def __init__(self, category_id, tab_id):
+	def __init__(self, category_id, tag_id):
 		self.category_id = category_id
-		self.tab_id = tab_id
+		self.tag_id = tag_id
 		
 		
 # Time event
@@ -134,15 +134,15 @@ class Time_event(Base):
 		
 # Category-Tab Table
 class Time_Tab(Base):
-	__tablename__ = "time_tab"
+	__tablename__ = "time_tag"
 	
 	id = Column(Integer, primary_key=True)
 	time_id = Column(Integer, ForeignKey("time_event.time_id"))
-	tab_id = Column(Integer, ForeignKey("tab.tab_id"))
+	tag_id = Column(Integer, ForeignKey("tag.tag_id"))
 
-	def __init__(self, time_id, tab_id):
+	def __init__(self, time_id, tag_id):
 		self.time_id = time_id
-		self.tab_id = tab_id
+		self.tag_id = tag_id
 
 # Create tables above
 Base.metadata.create_all(engine)
