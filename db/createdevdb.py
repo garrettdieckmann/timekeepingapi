@@ -30,7 +30,7 @@ class Database_creation():
 
 # Connect to Database
 dbc = Database_creation()
-engine = create_engine(dbc.create_engine_string(), echo=True)
+engine = create_engine(dbc.create_engine_string(), echo=False)
 Base = declarative_base()
 	
 
@@ -53,7 +53,7 @@ class Customer_Information(Base):
 	
 	user_id = Column(Integer, primary_key = True)
 	first_name = Column(String(32))
-	las_name = Column(String(32))
+	last_name = Column(String(32))
 	age = Column(Integer)
 	gender = Column(Boolean, unique=False, default=True) #0 - Male, 1 - Female
 	email = Column(String(128))
@@ -92,7 +92,7 @@ class Category(Base):
 
 		
 # Tab
-class Tab(Base):
+class Tag(Base):
 	__tablename__ = "tag"
 	
 	tag_id = Column(Integer, primary_key=True)
@@ -105,7 +105,7 @@ class Tab(Base):
 
 		
 # Category-Tab Table
-class Category_Tab(Base):
+class Category_Tag(Base):
 	__tablename__ = "category_tag"
 	
 	id = Column(Integer, primary_key=True)
@@ -118,7 +118,7 @@ class Category_Tab(Base):
 		
 		
 # Time event
-class Time_event(Base):
+class Time_Event(Base):
 	__tablename__ = "time_event"
 	
 	time_id = Column(Integer, primary_key=True)
@@ -133,7 +133,7 @@ class Time_event(Base):
 		self.end_time = end_time
 		
 # Category-Tab Table
-class Time_Tab(Base):
+class Time_Tag(Base):
 	__tablename__ = "time_tag"
 	
 	id = Column(Integer, primary_key=True)
