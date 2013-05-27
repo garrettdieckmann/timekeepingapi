@@ -123,8 +123,8 @@ class Time_Event(Base):
 	
 	time_id = Column(Integer, primary_key=True)
 	user_id = Column(Integer, ForeignKey("users.user_id"))
-	start_time = Column(Date)
-	end_time = Column(Date)
+	start_time = Column(Date) # Should be timestamp
+	end_time = Column(Date) # Should be timestamp
 	
 
 	def __init__(self, user_id, start_time, end_time):

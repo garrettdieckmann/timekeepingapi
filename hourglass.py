@@ -46,6 +46,20 @@ def db_users():
 		builder.append(data)
 	return jsonify(users=builder)
 
+# Show Categories for a user
+@app.route('/api/category/user/<userid>/', methods = ['GET'])
+def db_user_categories(userid):
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	builder = []
+	# All categories for a specific user
+	for category in session.query(Category).filter_by(user_id=userid):
+		data = {'category_name':category.category_name,
+			'category_description':category.category_description}
+		builder.append(data)
+	return jsonify(categories=builder)
+
 # Return specifics about a particular user
 @app.route('/api/user/<userid>/', methods = ['GET'])
 def db_user(userid):
@@ -57,7 +71,7 @@ def db_user(userid):
 
 	# Check if anything returned, if not 404
 	if(user):
-		return jsonify({'firstname':user.first_name, 'lastname':user.last_name, 'age':user.age, 'email':user.email, 'city':user.city, 'state':user.state, 'joined':str(user.date_joined)})
+		return jsonify(user={'firstname':user.first_name, 'lastname':user.last_name, 'age':user.age, 'email':user.email, 'city':user.city, 'state':user.state, 'joined':str(user.date_joined)})
 	else:
 		return not_found() 
 
