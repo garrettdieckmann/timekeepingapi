@@ -39,11 +39,12 @@ def db_users():
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
-	builder = ''
-	for user in session.query(Customer_Information).all():	
-		builder = builder + '{firstname:' + user.first_name + '},' 
-	builder = builder[:-1]
-	return builder
+	builder = []
+	for user in session.query(Customer_Information).all():
+		data = {'firstname':user.first_name,
+			'lastname':user.last_name}
+		builder.append(data)
+	return jsonify(users=builder)
 
 # Return specifics about a particular user
 @app.route('/api/user/<userid>/', methods = ['GET'])
