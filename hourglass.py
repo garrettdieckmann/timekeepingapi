@@ -33,45 +33,32 @@ def index():
 def devapi():
 	return "Root of the dev api"
 
-
-# Show users
-@app.route('/devapi/user/<userid>', methods = ['GET'])
-def show_users(userid):
-	users = {'1':'john', '2':'steve', '3':'bill', '4':'tony'}
-
-        if userid in users:
-                return jsonify({userid:users[userid]})
-		string_builder = ""
-        else:
-                return not_found()
-
 # New show users with SQL
-@app.route('/api/users', methods = ['GET'])
+@app.route('/api/users/', methods = ['GET'])
 def db_users():
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
-	builder = '({'
+	builder = ''
 	for user in session.query(Customer_Information).all():	
-		builder = builder + 'firstname:' + user.first_name
-	builder = builder + ')}'
+		builder = builder + '{firstname:' + user.first_name + '},' 
+	builder = builder[:-1]
 	return builder
 
-@app.route('/api/user/<userid>', methods = ['GET'])
+# Return specifics about a particular user
+@app.route('/api/user/<userid>/', methods = ['GET'])
 def db_user(userid):
 	Session = sessionmaker(bind=engine)
 	session = Session()
-	
-	result = session.query(Customer_Information).filter_by(user_id=userid)
-	for user in result:
-		return jsonify({'firstname':user.first_name
-				,'lastname':user.last_name
-				,'age':user.age
-				,'email':user.email
-				,'city':user.city
-				,'state':user.state
-				,'date joined':user.date_joined})
-	return not_found() 
+
+	# Using 'get' because only fetching 1 row for a specific user	
+	user = session.query(Customer_Information).get(userid)
+
+	# Check if anything returned, if not 404
+	if(user):
+		return jsonify({'firstname':user.first_name, 'lastname':user.last_name, 'age':user.age, 'email':user.email, 'city':user.city, 'state':user.state, 'joined':str(user.date_joined)})
+	else:
+		return not_found() 
 
 ### END DEV API ###
 
