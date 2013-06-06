@@ -1,6 +1,7 @@
 # Flask imports
 from flask import Flask, request, render_template
 from werkzeug.contrib.fixers import ProxyFix
+from werkzeug import check_password_hash
 from functools import wraps
 # Database imports
 # DB creation
@@ -32,7 +33,13 @@ def index():
 # Authorization - source: http://blog.luisrei.com/articles/flaskrest.html
 def check_auth(username, password):
 	# Check if the user is in the database
-	return true
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	for user in session.query(User).filter_by(user_name=username): 
+		if (user.user_name == username and user.password == check_password_hash(password)):
+			return true
+	return false
 
 def authenticate():
 	message = {'message': "Authenticate"}
