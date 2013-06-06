@@ -1,6 +1,7 @@
 # Flask imports
 from flask import Flask, request, render_template
 from werkzeug.contrib.fixers import ProxyFix
+from functools import wraps
 # Database imports
 # DB creation
 from db.createdevdb import Database_creation
@@ -28,6 +29,31 @@ def index():
 
 ### DEV API ###
 
+# Authorization - source: http://blog.luisrei.com/articles/flaskrest.html
+def check_auth(username, password):
+	# Check if the user is in the database
+	return true
+
+def authenticate():
+	message = {'message': "Authenticate"}
+	resp = jsonify(message)
+	
+	resp.status_code = 401
+	return resp
+
+def requires_auth(f):
+	@wraps(f)
+	def decorated(*args, **kwargs):
+		auth = request.authorization
+		# No parameters passed in
+		if not auth:
+			return authenticate()
+		# Check if user passed in valid credentials
+		elif not check_auth(auth.username, auth.password):
+			return authenticate()
+		return f(*args, **kwargs)
+	return decorated
+
 # Root
 @app.route('/devapi')
 def devapi():
@@ -35,6 +61,7 @@ def devapi():
 
 # New show users with SQL
 @app.route('/api/users/', methods = ['GET'])
+@requires_auth
 def db_users():
 	Session = sessionmaker(bind=engine)
 	session = Session()
