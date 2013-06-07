@@ -37,9 +37,7 @@ def check_auth(username, password):
 	session = Session()
 
 	for user in session.query(User).filter_by(user_name=username): 
-		if (user.user_name == username and check_password_hash(user.password, password)):
-			return True
-	return False
+		return (user.user_name == username and check_password_hash(user.password, password))
 
 def authenticate():
 	message = {'message': "Authenticate"}
@@ -60,6 +58,14 @@ def requires_auth(f):
 			return authenticate()
 		return f(*args, **kwargs)
 	return decorated
+
+# Check if user is requesting their own data
+def check_privs(userid, username):
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	for user in session.query(User).filter_by(user_name=username):
+		return (user.user_id == int(userid))	
 
 # Root
 @app.route('/devapi')
@@ -82,20 +88,26 @@ def db_users():
 
 # Show Categories for a user
 @app.route('/api/category/user/<userid>/', methods = ['GET'])
+@requires_auth
 def db_user_categories(userid):
-	Session = sessionmaker(bind=engine)
-	session = Session()
+	# Check if user is accessing their own data
+	if check_privs(userid, request.authorization.username):
+		Session = sessionmaker(bind=engine)
+		session = Session()
 
-	builder = []
-	# All categories for a specific user
-	for category in session.query(Category).filter_by(user_id=userid):
-		data = {'category_name':category.category_name,
-			'category_description':category.category_description}
-		builder.append(data)
-	return jsonify(categories=builder)
+		builder = []
+		# All categories for a specific user
+		for category in session.query(Category).filter_by(user_id=userid):
+			data = {'category_name':category.category_name,
+				'category_description':category.category_description}
+			builder.append(data)
+		return jsonify(categories=builder)
+	# User doesnt have correct privileges
+	return authenticate()
 
 # Return specifics about a particular user
 @app.route('/api/user/<userid>/', methods = ['GET'])
+@requires_auth
 def db_user(userid):
 	Session = sessionmaker(bind=engine)
 	session = Session()
