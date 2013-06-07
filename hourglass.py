@@ -37,9 +37,9 @@ def check_auth(username, password):
 	session = Session()
 
 	for user in session.query(User).filter_by(user_name=username): 
-		if (user.user_name == username and user.password == check_password_hash(password)):
-			return true
-	return false
+		if (user.user_name == username and check_password_hash(user.password, password)):
+			return True
+	return False
 
 def authenticate():
 	message = {'message': "Authenticate"}
