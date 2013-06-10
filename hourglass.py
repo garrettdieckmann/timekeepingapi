@@ -39,10 +39,14 @@ def check_auth(username, password):
 	for user in session.query(User).filter_by(user_name=username): 
 		return (user.user_name == username and check_password_hash(user.password, password))
 
-def authenticate():
-	message = {'message': "Authenticate"}
-	resp = jsonify(message)
+# Return error for bad authentication or bad authorization
+def auth_failure(failure_type):
+	if failure_type == 'Authorization':
+		message = {'message': "Requires Authorization"}
+	if failure_type == 'Authenticate':
+		message = {'message': "Requires Authentication"}
 	
+	resp = jsonify(message)
 	resp.status_code = 401
 	return resp
 
@@ -52,10 +56,10 @@ def requires_auth(f):
 		auth = request.authorization
 		# No parameters passed in
 		if not auth:
-			return authenticate()
+			return auth_failure(Authenicate)
 		# Check if user passed in valid credentials
 		elif not check_auth(auth.username, auth.password):
-			return authenticate()
+			return auth_failure(Authenticate)
 		return f(*args, **kwargs)
 	return decorated
 
@@ -103,23 +107,52 @@ def db_user_categories(userid):
 			builder.append(data)
 		return jsonify(categories=builder)
 	# User doesnt have correct privileges
-	return authenticate()
+	return auth_failure(Authorize)
 
-# Return specifics about a particular user
+# Create user/password combo
+@app.route('/api/user/login/', methods = ['POST'])
+def db_user_pw():
+	#TODO: Create this check as a decorator
+	auth = request.authorization
+	if not auth:
+		auth_failure(Authenticate)
+	else:
+		if requires_admin(auth.username, auth.password):
+			# Auth successful - Insert user into DB
+			Session = sessionmaker(bind=engine)
+			session = Session()
+			
+			# Mimic'ing a FORM
+			new_user = request.form['user']
+			new_pass = request.form['password']
+
+			#TODO insert into table
+				
+			
+		else:
+			auth_failure(Authorize)
+
+@app.route('/devapi/parsetest/', methods = ['POST'])
+def dev_parse_test():
+	return request.form['key']
+
+# User specifics
 @app.route('/api/user/<userid>/', methods = ['GET'])
 @requires_auth
 def db_user(userid):
-	Session = sessionmaker(bind=engine)
-	session = Session()
+	if check_privs(userid, request.authorization.username):
+		Session = sessionmaker(bind=engine)
+		session = Session()
 
-	# Using 'get' because only fetching 1 row for a specific user	
-	user = session.query(Customer_Information).get(userid)
+		# Using 'get' because only fetching 1 row for a specific user	
+		user = session.query(Customer_Information).get(userid)
 
-	# Check if anything returned, if not 404
-	if(user):
-		return jsonify(user={'firstname':user.first_name, 'lastname':user.last_name, 'age':user.age, 'email':user.email, 'city':user.city, 'state':user.state, 'joined':str(user.date_joined)})
-	else:
-		return not_found() 
+		# Check if anything returned, if not 404
+		if(user):
+			return jsonify(user={'firstname':user.first_name, 'lastname':user.last_name, 'age':user.age, 'email':user.email, 'city':user.city, 'state':user.state, 'joined':str(user.date_joined)})
+		else:
+			return not_found() 
+	return auth_failure(Authorize)
 
 ### END DEV API ###
 
