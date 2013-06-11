@@ -1,7 +1,7 @@
 # Flask imports
 from flask import Flask, request, render_template
 from werkzeug.contrib.fixers import ProxyFix
-from werkzeug import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 # Database imports
 # DB creation
@@ -28,7 +28,7 @@ def index():
 
 ### END BASIC SITE ###
 
-### DEV API ###
+### BEGIN AUTH SECTION ###
 
 # Authorization - source: http://blog.luisrei.com/articles/flaskrest.html
 def check_auth(username, password):
@@ -49,6 +49,10 @@ def auth_failure(failure_type):
 	resp = jsonify(message)
 	resp.status_code = 401
 	return resp
+
+# Basic admin validation
+def requires_admin(username, password):
+	return (username == 'admin' and password == 'secret')
 
 def requires_auth(f):
 	@wraps(f)
@@ -71,12 +75,11 @@ def check_privs(userid, username):
 	for user in session.query(User).filter_by(user_name=username):
 		return (user.user_id == int(userid))	
 
-# Root
-@app.route('/devapi')
-def devapi():
-	return "Root of the dev api"
+### END AUTH SECTION ###
 
-# New show users with SQL
+### BEGIN API ROUTES ###
+
+# Get all users in the database
 @app.route('/api/users/', methods = ['GET'])
 @requires_auth
 def db_users():
@@ -123,18 +126,22 @@ def db_user_pw():
 			session = Session()
 			
 			# Mimic'ing a FORM
-			new_user = request.form['user']
+			new_username = request.form['username']
 			new_pass = request.form['password']
-
-			#TODO insert into table
-				
 			
+			# Create the user object
+			new_user = User(new_username, generate_password_hash(new_pass))
+			# Save new user to the database
+			session.add(new_user)
+			session.flush()
+			session.commit()
+			
+			# Creation successful
+			resp = jsonify({'creation': "Successful"})
+			resp.status_code = 200
+			return resp
 		else:
 			auth_failure(Authorize)
-
-@app.route('/devapi/parsetest/', methods = ['POST'])
-def dev_parse_test():
-	return request.form['key']
 
 # User specifics
 @app.route('/api/user/<userid>/', methods = ['GET'])
@@ -154,7 +161,7 @@ def db_user(userid):
 			return not_found() 
 	return auth_failure(Authorize)
 
-### END DEV API ###
+### END API ROUTES ### 
 
 # Internal 404 to API
 @app.errorhandler(404)
